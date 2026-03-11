@@ -3,49 +3,46 @@ html
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- 모바일 화면 비율 고정 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>요즘 누가 음악을 듣나 - 이하소</title>
     <style>
-        /* 모바일 전체 화면 높이 최적화 */
+        * { box-sizing: border-box; }
         body { 
             background: #000; color: #eee; font-family: sans-serif; margin: 0; 
             display: flex; flex-direction: column; align-items: center; 
             height: 100vh; height: -webkit-fill-available; overflow: hidden; 
         }
         
-        h1 { margin: 10px 0; font-size: 1.2rem; color: #f0db4f; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        h1 { margin: 15px 0 10px 0; font-size: 1.2rem; color: #f0db4f; text-align: center; }
 
-        /* 게임 박스: 모바일에서 상하 여백을 고려해 높이 조절 */
+        /* 게임 박스: 높이를 픽셀(px)로 고정하여 화면이 사라지는 현상 방지 */
         #game-box { 
-            position: relative; width: 92%; max-width: 600px; height: 50%; 
+            position: relative; width: 92%; max-width: 500px; 
+            height: 350px; /* 높이를 확실하게 고정 */
             background-color: #222;
             background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('cover.jpg');
             background-size: cover; background-position: center; 
             border: 2px solid #f0db4f; border-radius: 15px; overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         .word { 
             position: absolute; color: #fff; font-weight: bold; font-size: 1.1rem; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,1); padding: 5px 10px; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,1); padding: 6px 12px; 
             background: rgba(0,0,0,0.5); border-radius: 8px; white-space: nowrap; 
         }
 
-        /* 하단 UI 영역: 재생 버튼이 잘리지 않게 하단 여백(padding-bottom) 추가 */
-        #ui-area { width: 100%; padding: 15px 0 30px 0; text-align: center; }
+        /* 하단 컨트롤 영역: 여백을 줘서 재생 버튼이 잘리지 않게 함 */
+        #ui-area { width: 100%; padding: 10px 0 40px 0; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
         input { 
-            width: 85%; max-width: 300px; padding: 12px; font-size: 1rem; border-radius: 25px; 
+            width: 85%; max-width: 300px; padding: 15px; font-size: 1rem; border-radius: 25px; 
             border: 2px solid #f0db4f; background: #111; color: white; outline: none; 
-            text-align: center; margin-top: 5px;
+            text-align: center; margin-bottom: 10px;
         }
         
-        .score-info { margin-top: 8px; font-size: 1rem; color: #f0db4f; font-weight: bold; }
-        
-        audio { margin-top: 10px; width: 90%; max-width: 400px; height: 35px; }
+        .score-info { font-size: 1rem; color: #f0db4f; font-weight: bold; margin-bottom: 5px; }
+        audio { width: 90%; max-width: 400px; height: 40px; }
 
-        /* 결과 화면 */
         #result-screen { 
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 10; flex-direction: column; 
@@ -61,16 +58,15 @@ html
     <div id="game-box">
         <div id="result-screen">
             <h2 style="color:#f0db4f;">노래가 끝났습니다!</h2>
-            <p id="final-score" style="font-size:1.3rem;">최종 점수: 0</p>
-            <p style="padding:0 20px; font-size:0.9rem;">"음악을 들을 여유가 없는 세상에 던져진 노래"</p>
-            <a href="https://www.youtube.com/@yihaso" target="_blank" class="btn">🎧 이하소 유튜브 구독하기</a>
+            <p id="final-score">점수: 0</p>
+            <a href="https://www.youtube.com" target="_blank" class="btn">🎧 이하소 유튜브 구독하기</a>
             <button onclick="location.reload()" class="btn" style="background:#444; color:#fff; margin-top:10px;">다시 도전</button>
         </div>
     </div>
 
     <div id="ui-area">
-        <input type="text" id="input-word" placeholder="▶ 버튼을 눌러 게임 시작!">
         <div class="score-info">Score: <span id="score">0</span></div>
+        <input type="text" id="input-word" placeholder="▶ 버튼 누르고 가사 입력!">
         <audio id="music" src="song.mp3" controls></audio>
     </div>
 
@@ -81,7 +77,6 @@ html
         const scoreDisplay = document.getElementById('score');
         const resultScreen = document.getElementById('result-screen');
 
-        // 보내주신 소중한 타이밍 데이터를 그대로 유지했습니다 (특수 따옴표 수정 완료)
         const lyrics = [
             {time: 2.0, text: "요즘"}, {time: 2.5, text: "누가"}, {time: 3.0, text: "음악을"}, {time: 3.5, text: "듣나"},
             {time: 5.0, text: "나도"}, {time: 5.5, text: "유튜브만"}, {time: 6.0, text: "보는데"},
@@ -107,41 +102,25 @@ html
         ];
 
         let score = 0; let activeWords = []; let idx = 0;
-
         music.onplay = () => { input.focus(); update(); };
-        
-        music.onended = () => {
-            resultScreen.style.display = 'flex';
-            document.getElementById('final-score').innerText = "최종 점수: " + score;
-        };
+        music.onended = () => { resultScreen.style.display = 'flex'; document.getElementById('final-score').innerText = "최종 점수: " + score; };
 
         function update() {
             const now = music.currentTime;
-            
-            if (idx < lyrics.length && now >= lyrics[idx].time) {
-                spawn(lyrics[idx].text);
-                idx++;
-            }
-
+            if (idx < lyrics.length && now >= lyrics[idx].time) { spawn(lyrics[idx].text); idx++; }
             activeWords.forEach((obj, i) => {
-                obj.y += 1.0; // 모바일 가독성을 위해 속도를 1.1 -> 1.0으로 미세 조정
+                obj.y += 1.2; 
                 obj.el.style.top = obj.y + 'px';
-                if (obj.y > gameBox.offsetHeight - 40) {
-                    gameBox.removeChild(obj.el);
-                    activeWords.splice(i, 1);
-                }
+                if (obj.y > gameBox.offsetHeight - 45) { gameBox.removeChild(obj.el); activeWords.splice(i, 1); }
             });
-
             if (!music.paused) requestAnimationFrame(update);
         }
 
         function spawn(txt) {
             const el = document.createElement('div');
-            el.className = 'word';
-            el.innerText = txt;
+            el.className = 'word'; el.innerText = txt;
             el.style.left = Math.random() * (gameBox.offsetWidth - 110) + 'px';
-            el.style.top = '0px';
-            gameBox.appendChild(el);
+            el.style.top = '0px'; gameBox.appendChild(el);
             activeWords.push({ el, text: txt, y: 0 });
         }
 
@@ -149,12 +128,7 @@ html
             if (e.key === 'Enter') {
                 const val = input.value.trim();
                 const targetIdx = activeWords.findIndex(w => w.text === val);
-                if (targetIdx > -1) {
-                    gameBox.removeChild(activeWords[targetIdx].el);
-                    activeWords.splice(targetIdx, 1);
-                    score += 10;
-                    scoreDisplay.innerText = score;
-                }
+                if (targetIdx > -1) { gameBox.removeChild(activeWords[targetIdx].el); activeWords.splice(targetIdx, 1); score += 10; scoreDisplay.innerText = score; }
                 input.value = '';
             }
         });
