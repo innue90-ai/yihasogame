@@ -14,7 +14,6 @@ html
         }
         h1 { margin: 15px 0 10px 0; font-size: 1.1rem; color: #f0db4f; text-align: center; }
 
-        /* 게임 박스: 모바일에서 가독성을 위해 높이 고정 */
         #game-box { 
             position: relative; width: 92%; max-width: 500px; height: 350px; 
             background-color: #222;
@@ -29,7 +28,6 @@ html
             background: rgba(0,0,0,0.5); border-radius: 8px; white-space: nowrap; 
         }
 
-        /* 하단 UI: 키보드와 재생 버튼 간섭 방지 */
         #ui-area { width: 100%; padding: 10px 0 40px 0; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         input { 
             width: 85%; max-width: 300px; padding: 14px; font-size: 1rem; border-radius: 25px; 
@@ -62,7 +60,7 @@ html
 
     <div id="ui-area">
         <div class="score-info">Score: <span id="score">0</span></div>
-        <input type="text" id="input-word" placeholder="▶ 버튼 누르고 시작! (5초 뒤 등장)">
+        <input type="text" id="input-word" placeholder="▶ 재생 버튼을 누르고 시작!">
         <audio id="music" src="song.mp3" controls></audio>
     </div>
 
@@ -73,31 +71,31 @@ html
         const scoreDisplay = document.getElementById('score');
         const resultScreen = document.getElementById('result-screen');
 
-        // 초반 여유를 위해 전체적으로 타이밍을 늦춘 가사 데이터
+        // 초반 30초 구간 가사 간격을 더 여유 있게 조정했습니다.
         const lyrics = [
-            {time: 5.0, text: "요즘"}, {time: 5.6, text: "누가"}, {time: 6.2, text: "음악을"}, {time: 6.8, text: "듣나"},
-            {time: 8.5, text: "나도"}, {time: 9.2, text: "유튜브만"}, {time: 10.0, text: "보는데"},
-            {time: 13.0, text: "세상엔"}, {time: 13.8, text: "너무"}, {time: 14.5, text: "재밌는"}, {time: 15.2, text: "게"}, {time: 16.0, text: "많고"},
-            {time: 18.0, text: "음악을"}, {time: 18.8, text: "들을"}, {time: 19.5, text: "여유는"}, {time: 20.2, text: "없어"},
-            {time: 23.0, text: "아무도"}, {time: 23.8, text: "들어주지"}, {time: 24.5, text: "않을"},
-            {time: 26.5, text: "노랠"}, {time: 27.2, text: "오늘도"}, {time: 28.0, text: "곱씹으며"},
-            {time: 32.0, text: "세상에"}, {time: 32.8, text: "던져질"}, {time: 33.5, text: "내"}, {time: 34.5, text: "모래알을"},
-            {time: 37.0, text: "이리저리"}, {time: 38.0, text: "다듬어보네"},
-            {time: 40.0, text: "요즘"}, {time: 40.8, text: "누가"}, {time: 41.5, text: "음악을"}, {time: 42.2, text: "듣나"},
-            {time: 45.0, text: "나도"}, {time: 45.8, text: "잘"}, {time: 46.5, text: "안"}, {time: 47.2, text: "듣는데"},
-            {time: 50.0, text: "세상엔"}, {time: 51.0, text: "누가"}, {time: 51.8, text: "음악을"}, {time: 52.8, text: "사고"}, {time: 54.0, text: "팔까"},
-            {time: 56.5, text: "서랍"}, {time: 57.2, text: "속에"}, {time: 58.0, text: "내"}, {time: 59.5, text: "노래도"}, {time: 60.5, text: "사줘"},
-            {time: 63.0, text: "제발"},
-            {time: 68.0, text: "요즘"}, {time: 68.8, text: "누가"}, {time: 69.5, text: "음악을"}, {time: 70.2, text: "듣나"},
-            {time: 73.0, text: "나도"}, {time: 73.8, text: "유튜브만"}, {time: 74.5, text: "보는데"}, 
-            {time: 77.0, text: "세상엔"}, {time: 77.8, text: "너무"}, {time: 78.5, text: "재밌는"}, {time: 80.0, text: "게"}, {time: 80.8, text: "많고"},
-            {time: 83.0, text: "음악을"}, {time: 83.8, text: "들을"}, {time: 84.5, text: "여유는"}, {time: 85.2, text: "없어"},
-            {time: 88.0, text: "아무도"}, {time: 88.8, text: "들어주지"}, {time: 89.5, text: "않을"},
-            {time: 92.0, text: "노랠"}, {time: 93.5, text: "오늘도"}, {time: 94.2, text: "곱씹으며"},
-            {time: 97.0, text: "세상에"}, {time: 98.0, text: "던져질"}, {time: 99.2, text: "내"}, {time: 100.0, text: "모래알을"},
-            {time: 103.0, text: "이리저리"}, {time: 105.5, text: "다듬어보네"},
-            {time: 108.0, text: "제발"}, {time: 109.0, text: "내"}, {time: 110.0, text: "노래도"}, {time: 112.5, text: "사줘"},
-            {time: 116.0, text: "제발"}, {time: 119.0, text: "제발"}, {time: 122.0, text: "제발"}, {time: 128.0, text: "에이씨"}
+            {time: 1.5, text: "요즘"}, {time: 2.5, text: "누가"}, {time: 3.5, text: "음악을"}, {time: 4.5, text: "듣나"},
+            {time: 7.0, text: "나도"}, {time: 8.5, text: "유튜브만"}, {time: 10.0, text: "보는데"},
+            {time: 14.0, text: "세상엔"}, {time: 15.5, text: "너무"}, {time: 17.0, text: "재밌는"}, {time: 18.5, text: "게"}, {time: 20.0, text: "많고"},
+            {time: 23.0, text: "음악을"}, {time: 24.5, text: "들을"}, {time: 26.0, text: "여유는"}, {time: 27.5, text: "없어"},
+            {time: 31.0, text: "아무도"}, {time: 32.5, text: "들어주지"}, {time: 34.0, text: "않을"},
+            {time: 37.0, text: "노랠"}, {time: 38.5, text: "오늘도"}, {time: 40.0, text: "곱씹으며"},
+            {time: 44.0, text: "세상에"}, {time: 45.0, text: "던져질"}, {time: 46.0, text: "내"}, {time: 47.5, text: "모래알을"},
+            {time: 50.0, text: "이리저리"}, {time: 52.0, text: "다듬어보네"},
+            {time: 55.0, text: "요즘"}, {time: 56.0, text: "누가"}, {time: 57.0, text: "음악을"}, {time: 58.0, text: "듣나"},
+            {time: 61.0, text: "나도"}, {time: 62.0, text: "잘"}, {time: 63.0, text: "안"}, {time: 64.0, text: "듣는데"},
+            {time: 68.0, text: "세상엔"}, {time: 69.5, text: "누가"}, {time: 71.0, text: "음악을"}, {time: 72.5, text: "사고"}, {time: 74.0, text: "팔까"},
+            {time: 77.0, text: "서랍"}, {time: 78.5, text: "속에"}, {time: 80.0, text: "내"}, {time: 81.5, text: "노래도"}, {time: 83.0, text: "사줘"},
+            {time: 85.0, text: "제발"},
+            {time: 89.0, text: "요즘"}, {time: 90.0, text: "누가"}, {time: 91.0, text: "음악을"}, {time: 92.0, text: "듣나"},
+            {time: 95.0, text: "나도"}, {time: 96.5, text: "유튜브만"}, {time: 98.0, text: "보는데"}, 
+            {time: 101.0, text: "세상엔"}, {time: 102.5, text: "너무"}, {time: 104.0, text: "재밌는"}, {time: 105.5, text: "게"}, {time: 107.0, text: "많고"},
+            {time: 110.0, text: "음악을"}, {time: 111.5, text: "들을"}, {time: 113.0, text: "여유는"}, {time: 114.5, text: "없어"},
+            {time: 118.0, text: "아무도"}, {time: 119.5, text: "들어주지"}, {time: 121.0, text: "않을"},
+            {time: 124.0, text: "노랠"}, {time: 126.0, text: "오늘도"}, {time: 128.0, text: "곱씹으며"},
+            {time: 132.0, text: "세상에"}, {time: 133.5, text: "던져질"}, {time: 135.0, text: "내"}, {time: 136.5, text: "모래알을"},
+            {time: 139.5, text: "이리저리"}, {time: 142.0, text: "다듬어보네"},
+            {time: 145.0, text: "제발"}, {time: 146.5, text: "내"}, {time: 148.0, text: "노래도"}, {time: 150.0, text: "사줘"},
+            {time: 153.0, text: "제발"}, {time: 156.0, text: "제발"}, {time: 159.0, text: "제발"}, {time: 164.0, text: "에이씨"}
         ];
 
         let score = 0; let activeWords = []; let idx = 0;
@@ -108,7 +106,7 @@ html
             const now = music.currentTime;
             if (idx < lyrics.length && now >= lyrics[idx].time) { spawn(lyrics[idx].text); idx++; }
             activeWords.forEach((obj, i) => {
-                obj.y += 1.2; 
+                obj.y += 0.8; // 낙하 속도를 1.2에서 0.8로 낮춰 훨씬 여유롭게 설정
                 obj.el.style.top = obj.y + 'px';
                 if (obj.y > gameBox.offsetHeight - 45) { gameBox.removeChild(obj.el); activeWords.splice(i, 1); }
             });
