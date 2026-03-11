@@ -1,0 +1,124 @@
+html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>요즘 누가 음악을 듣나 - 이하소</title>
+    <style>
+        body { background: #000; color: #eee; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        h1 { margin-bottom: 10px; font-size: 1.4rem; color: #f0db4f; }
+        #game-box { 
+            position: relative; width: 90%; max-width: 600px; height: 450px; background-color: #222;
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('cover.jpg');
+            background-size: cover; background-position: center; border: 3px solid #f0db4f; border-radius: 15px; overflow: hidden;
+        }
+        .word { position: absolute; color: #fff; font-weight: bold; font-size: 1.25rem; text-shadow: 2px 2px 4px rgba(0,0,0,1); padding: 6px 12px; background: rgba(0,0,0,0.5); border-radius: 8px; white-space: nowrap; transition: transform 0.2s; }
+        #ui-area { margin-top: 20px; text-align: center; }
+        input { width: 280px; padding: 15px; font-size: 1.1rem; border-radius: 30px; border: 2px solid #f0db4f; background: #111; color: white; outline: none; text-align: center; }
+        .score-info { margin-top: 10px; font-size: 1.1rem; color: #f0db4f; }
+        audio { margin-top: 15px; height: 35px; }
+        #result-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .btn { margin-top: 15px; padding: 12px 24px; background: #f0db4f; color: #000; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <h1>🎵 요즘 누가 음악을 듣나 - 이하소</h1>
+    <div id="game-box">
+        <div id="result-screen">
+            <h2 style="color:#f0db4f;">노래가 끝났습니다!</h2>
+            <p id="final-score" style="font-size:1.5rem;">점수: 0</p>
+            <p>"음악을 들을 여유가 없는 세상에 던져진 노래"</p>
+            <a href="https://www.youtube.com/@yihaso" target="_blank" class="btn">🎧 이하소 유튜브 구독하기</a>
+            <button onclick="location.reload()" class="btn" style="background:#444; color:#fff;">다시 도전</button>
+        </div>
+    </div>
+
+    <div id="ui-area">
+        <input type="text" id="input-word" placeholder="▶ 버튼을 눌러 게임 시작!">
+        <div class="score-info">Score: <span id="score">0</span></div>
+        <audio id="music" src="song.mp3" controls></audio>
+    </div>
+
+    <script>
+        const music = document.getElementById('music');
+        const input = document.getElementById('input-word');
+        const gameBox = document.getElementById('game-box');
+        const scoreDisplay = document.getElementById('score');
+        const resultScreen = document.getElementById('result-screen');
+
+        const lyrics = [
+            {time: 2.0, text: "요즘"}, {time: 2.5, text: "누가"}, {time: 3.0, text: "음악을"}, {time: 3.5, text: "듣나"},
+            {time: 5.0, text: "나도"}, {time: 5.5, text: "유튜브만"}, {time: 6.0, text: "보는데"},
+            {time: 8.5, text: "세상엔"}, {time: 9.0, text: "너무"}, {time: 9.5, text: "재밌는"}, {time: 10.0, text: "게"}, {time: 10.5, text: "많고"},
+            {time: 12.0, text: "음악을"}, {time: 12.5, text: "들을"}, {time: 13.0, text: "여유는"}, {time: 13.5, text: "없어"},
+            {time: 16.0, text: "아무도"}, {time: 16.5, text: "들어주지"}, {time: 17.0, text: "않을"},
+            {time: 18.5, text: "노랠"}, {time: 19.0, text: "오늘도"}, {time: 19.5, text: "곱씹으며"},
+            {time: 24.0, text: "세상에"}, {time: 24.5, text: "던져질"}, {time: 24.8, text: "내"}, {time: 25.5, text: "모래알을"},
+            {time: 28.5, text: "이리저리"}, {time: 29.0, text: "다듬어보네"},
+            {time: 30.0, text: "요즘"}, {time: 30.5, text: "누가"}, {time: 31.0, text: "음악을"}, {time: 31.5, text: "듣나"},
+            {time: 34.5, text: "나도"}, {time: 35.0, text: "잘"}, {time: 35.5, text: "안"}, {time: 36.0, text: "듣는데"},
+            {time: 39.0, text: "세상엔"}, {time: 40.0, text: "누가"}, {time: 40.5, text: "음악을"}, {time: 41.5, text: "사고"}, {time: 43.0, text: "팔까"},
+            {time: 45.0, text: "서랍"}, {time: 45.5, text: "속에"}, {time: 46.0, text: "내"}, {time: 47.5, text: "노래도"}, {time: 48.0, text: "사줘"},
+            {time: 50.5, text: "제발"},
+            {time: 55.0, text: "요즘"}, {time: 55.5, text: "누가"}, {time: 56.0, text: "음악을"}, {time: 56.5, text: "듣나"},
+            {time: 59.0, text: "나도"}, {time: 59.5, text: "유튜브만"}, {time: 60.0, text: "보는데"}, {time: 62.5, text: "세상엔"}, {time: 63.0, text: "너무"}, {time: 63.5, text: "재밌는"}, {time: 65.0, text: "게"}, {time: 65.5, text: "많고"},
+            {time: 66.5, text: "음악을"}, {time: 67.0, text: "들을"}, {time: 67.5, text: "여유는"}, {time: 68.0, text: "없어"}, {time: 71.0, text: "아무도"}, {time: 71.5, text: "들어주지"}, {time: 72.0, text: "않을"},
+            {time: 74.5, text: "노랠"}, {time: 76.0, text: "오늘도"}, {time: 76.5, text: "곱씹으며"},
+            {time: 78.0, text: "세상에"}, {time: 79.0, text: "던져질"}, {time: 80.0, text: "내"}, {time: 80.5, text: "모래알을"},
+            {time: 82.5, text: "이리저리"}, {time: 85.0, text: "다듬어보네"},
+            {time: 87.0, text: "제발"}, {time: 87.5, text: "내"}, {time: 88.0, text: "노래도"}, {time: 90.0, text: "사줘"},
+            {time: 93.0, text: "제발"}, {time: 96.0, text: "제발"}, {time: 98.0, text: "제발"}, {time: 104.0, text: "에이씨"}
+        ];
+
+        let score = 0; let activeWords = []; let idx = 0;
+
+        music.onplay = () => { input.focus(); update(); };
+        music.onended = () => {
+            resultScreen.style.display = 'flex';
+            document.getElementById('final-score').innerText = "최종 점수: " + score;
+        };
+
+        function update() {
+            const now = music.currentTime;
+            if (idx < lyrics.length && now >= lyrics[idx].time) {
+                spawn(lyrics[idx].text);
+                idx++;
+            }
+            activeWords.forEach((obj, i) => {
+                obj.y += 1.1; 
+                obj.el.style.top = obj.y + 'px';
+                if (obj.y > gameBox.offsetHeight - 40) {
+                    gameBox.removeChild(obj.el);
+                    activeWords.splice(i, 1);
+                }
+            });
+            if (!music.paused) requestAnimationFrame(update);
+        }
+
+        function spawn(txt) {
+            const el = document.createElement('div');
+            el.className = 'word';
+            el.innerText = txt;
+            el.style.left = Math.random() * (gameBox.offsetWidth - 120) + 'px';
+            el.style.top = '0px';
+            gameBox.appendChild(el);
+            activeWords.push({ el, text: txt, y: 0 });
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = input.value.trim();
+                const targetIdx = activeWords.findIndex(w => w.text === val);
+                if (targetIdx > -1) {
+                    gameBox.removeChild(activeWords[targetIdx].el);
+                    activeWords.splice(targetIdx, 1);
+                    score += 10;
+                    scoreDisplay.innerText = score;
+                }
+                input.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
